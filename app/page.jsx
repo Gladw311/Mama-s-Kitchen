@@ -1312,7 +1312,7 @@ ${weekBudgetAmount && weekBudgetCurrency === "USD" ? "Keep the total shopping co
         {/* TRIBUTE FOOTER */}
         <div className="tribute-footer">
           <div className="tribute-quote">"The love of a mother is the heart of the home —<br/>and it lives on in every meal made with care."</div>
-          <div className="tribute-name">✦ Mama's Kitchen — In Loving Memory ✦</div>
+          <div className="tribute-name">✦ Mama's Kitchen✦</div>
         </div>
 
       </div>
