@@ -1,7 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 
-
 const FONTS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Pinyon+Script&display=swap');
 `;
@@ -691,20 +690,15 @@ const styles = `
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-async function callClaude(systemPrompt, userPrompt) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+async function callAPI(type, payload) {
+  const res = await fetch("/api/claude", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
-    }),
+    body: JSON.stringify({ type, ...payload }),
   });
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content[0].text;
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data.text;
 }
 
 const SYSTEM_RECIPE = `You are Mama's Kitchen — a warm, expert recipe assistant dedicated to beautiful, nourishing cooking in the Kenyan context and beyond. You were created in loving memory of a mother who passed on.
@@ -807,8 +801,8 @@ export default function MamasKitchen() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await window.storage.get("mamas-kitchen-reviews", true);
-        if (res?.value) setReviews(JSON.parse(res.value));
+        const saved = localStorage.getItem("mamas-kitchen-reviews");
+if (saved) setReviews(JSON.parse(saved));
       } catch {}
     })();
   }, []);
@@ -825,7 +819,7 @@ export default function MamasKitchen() {
     };
     const updated = [newReview, ...reviews];
     setReviews(updated);
-    try { await window.storage.set("mamas-kitchen-reviews", JSON.stringify(updated), true); } catch {}
+    try {localStorage.setItem("mamas-kitchen-reviews", JSON.stringify(updated)); } catch {}
     setReviewName(""); setReviewText(""); setReviewRating(5);
     setReviewSubmitting(false);
     setReviewSuccess(true);
@@ -863,9 +857,9 @@ Servings: ${servings}
 
 ${ingredients ? "Please use my ingredients creatively — even suggest combinations I might not know existed!" : ""}
 ${budgetAmount && budgetCurrency === "KSH" ? "Keep ingredients affordable and available in Kenyan markets." : ""}`;
-      const result = await callClaude(SYSTEM_RECIPE, prompt);
+      const result = await callAPI("recipe", {prompt});
       setRecipeResult(result);
-    } catch (e) {
+    } catch (e) {}
       setRecipeError("Couldn't fetch recipe right now. Please try again.");
     }
     setLoading(false);
@@ -884,7 +878,7 @@ Health focus: ${weekHealth.length ? weekHealth.join(", ") : "Balanced general he
 Context: Nairobi, Kenya. Mix local and some international dishes. Include breakfast, lunch, and dinner each day.
 ${weekBudgetAmount && weekBudgetCurrency === "KSH" ? "Keep the total shopping cost within the stated KSH budget. Suggest affordable Kenyan ingredients." : ""}
 ${weekBudgetAmount && weekBudgetCurrency === "USD" ? "Keep the total shopping cost within the stated USD budget." : ""}`;
-      const raw = await callClaude(SYSTEM_WEEK, prompt);
+      const raw = await callAPI("week", {prompt});
       const clean = raw.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(clean);
       setWeekData(parsed);
@@ -906,19 +900,8 @@ ${weekBudgetAmount && weekBudgetCurrency === "USD" ? "Keep the total shopping co
         ...history.map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.text })),
         { role: "user", content: userMsg }
       ];
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: SYSTEM_CHAT,
-          messages,
-        }),
-      });
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-      setChatMessages(prev => [...prev, { role: "ai", text: data.content[0].text }]);
+      const result = await callAPI("chat", { messages });
+setChatMessages(prev => [...prev, { role: "ai", text: result }]);
     } catch {
       setChatMessages(prev => [...prev, { role: "ai", text: "I'm having trouble connecting right now. Please try again in a moment. 🌸" }]);
     }
@@ -1312,7 +1295,7 @@ ${weekBudgetAmount && weekBudgetCurrency === "USD" ? "Keep the total shopping co
         {/* TRIBUTE FOOTER */}
         <div className="tribute-footer">
           <div className="tribute-quote">"The love of a mother is the heart of the home —<br/>and it lives on in every meal made with care."</div>
-          <div className="tribute-name">✦ Mama's Kitchen✦</div>
+          <div className="tribute-name">✦ Mama's Kitchen — In Loving Memory ✦</div>
         </div>
 
       </div>
