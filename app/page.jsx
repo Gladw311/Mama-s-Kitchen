@@ -1297,12 +1297,9 @@ setChatMessages(prev => [...prev, { role: "ai", text: result }]);
           <div className="tribute-quote">"The love of a mother is the heart of the home —<br/>and it lives on in every meal made with care."</div>
           <div className="tribute-name">✦ Mama's Kitchen — In Loving Memory ✦</div>
         </div>
-
       </div>
     </>
   );
-}
-
 function formatRecipe(text) {
   return text
     .replace(/^(🍽️[^\n]+)/gm, '<h3>$1</h3>')
