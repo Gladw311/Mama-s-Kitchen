@@ -1296,7 +1296,7 @@ setChatMessages(prev => [...prev, { role: "ai", text: result }]);
         {/* TRIBUTE FOOTER */}
         <div className="tribute-footer">
           <div className="tribute-quote">"The love of a mother is the heart of the home —<br/>and it lives on in every meal made with care."</div>
-          <div className="tribute-name">✦ Mama's Kitchen — In Loving Memory ✦</div>
+          <div className="tribute-name">✦ Mama's Kitchen- Made with Love ♥✦</div>
         </div>
       </div>
     </>
