@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = 'force-dynamic';
 import { useState, useRef, useEffect } from "react";
 
 const FONTS = `
@@ -859,7 +860,7 @@ ${ingredients ? "Please use my ingredients creatively — even suggest combinati
 ${budgetAmount && budgetCurrency === "KSH" ? "Keep ingredients affordable and available in Kenyan markets." : ""}`;
       const result = await callAPI("recipe", {prompt});
       setRecipeResult(result);
-    } catch (e) {}
+    } catch (e) {
       setRecipeError("Couldn't fetch recipe right now. Please try again.");
     }
     setLoading(false);
@@ -910,7 +911,7 @@ setChatMessages(prev => [...prev, { role: "ai", text: result }]);
 
   return (
     <>
-      <style>{styles}</style>
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
       <div className="app">
 
         {/* NAV */}
@@ -1300,6 +1301,7 @@ setChatMessages(prev => [...prev, { role: "ai", text: result }]);
       </div>
     </>
   );
+}
 function formatRecipe(text) {
   return text
     .replace(/^(🍽️[^\n]+)/gm, '<h3>$1</h3>')
