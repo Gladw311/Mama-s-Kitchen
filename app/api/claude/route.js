@@ -68,9 +68,10 @@ export async function POST(request) {
 
     // 5. Parse and return final output
     const data = await response.json();
-    const reply = data.choices[0]?.message?.content;
-
-    return NextResponse.json({ result: reply });
+    const message = data.choices[0]?.message;
+const text = message?.content || message?.reasoning_content || "";
+if (!text) throw new Error("Empty response from model");
+return NextResponse.json({ text });
   } catch (error) {
     console.error("Server API Route Error:", error);
     return NextResponse.json(
